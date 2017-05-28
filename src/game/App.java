@@ -11,7 +11,7 @@ public class App {
 		list.add(new Piece(3, 2, 1));
 		list.add(new Piece(4, 2, 1));
 		
-		Gameboard game = new Gameboard(list);
+		Gameboard game = new Gameboard(30, list);
 		System.out.println(game.toString());
 		int gameStatus = game.isGameOver(3, 2);
 		if (gameStatus > 0) {
@@ -21,5 +21,9 @@ public class App {
 		} else {
 			System.out.println("Game is not over.");
 		}
+		
+		// Who goes first?
+		
+		// Max time limit 0 to 30 seconds for computer move.
 	}
 }
