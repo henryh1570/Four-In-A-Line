@@ -17,6 +17,53 @@ public class Gameboard {
 			BOARD[p.getX()][p.getY()] = p.getOwner();
 		}
 	}
+	
+	public int[][] getBoard() {
+		return BOARD;
+	}
+	
+	public int isGameOver() {
+		int playerCounter = 0;
+		int opponentCounter = 0;
+
+		// Consecutive 4 pieces returns true.
+		for (int x = 0; x < BOARD.length; x++) {
+			for (int y = 0; y < BOARD.length; y++) {
+				if (BOARD[x][y] > 0) {
+					playerCounter++;
+					opponentCounter = 0;
+				} else if (BOARD[x][y] < 0) {
+					opponentCounter++;
+					playerCounter = 0;
+				} else {
+					playerCounter = 0;
+					opponentCounter = 0;
+				}
+			}
+			opponentCounter = 0;
+			playerCounter = 0;
+		}
+		
+		// Consecutive 4 pieces returns true.
+		for (int x = 0; x < BOARD.length; x++) {
+			for (int y = 0; y < BOARD.length; y++) {
+				if (BOARD[y][x] > 0) {
+					playerCounter++;
+					opponentCounter = 0;
+				} else if (BOARD[y][x] < 0) {
+					opponentCounter++;
+					playerCounter = 0;
+				} else {
+					playerCounter = 0;
+					opponentCounter = 0;
+				}
+			}
+			opponentCounter = 0;
+			playerCounter = 0;
+		}
+
+		return 0; // No one wins.
+	}
 
 	// Given a point, check the same row and column for a 4 line.
 	// Should be called right after a player makes a move.
@@ -32,8 +79,10 @@ public class Gameboard {
 			if (BOARD[i][y] != 0) {
 				if (BOARD[i][y] < 0) {
 					playerHorizontalCounter = 0;
+					opponentHorizontalCounter++;
 				} else {
 					playerHorizontalCounter++;
+					opponentHorizontalCounter = 0;
 				}
 				// Check if done.
 				if (playerHorizontalCounter == 4) {
@@ -74,7 +123,7 @@ public class Gameboard {
 		int x = p.getX();
 		int y = p.getY();
 		int owner = p.getOwner();
-
+		
 		if (x > 8 || x < 0) {
 			// Check X boundaries
 			return false;
@@ -92,8 +141,16 @@ public class Gameboard {
 		}
 	}
 	
+	public Gameboard makeMove(Piece p) {
+		int x = p.getX();
+		int y = p.getY();
+		int owner = p.getOwner();
+		BOARD[x][y] = owner;
+		return this;
+	}
+	
 	// Return all possible next states of a user's turn.
-	public ArrayList<Gameboard> getNextStates() {
+	public ArrayList<Gameboard> getNextStates(int moveValue) {
 		ArrayList<Gameboard> states = new ArrayList<Gameboard>();
 		for (int i = 0; i < BOARD.length; i++) {
 			for (int k = 0; k < BOARD.length; k++) {
@@ -102,7 +159,7 @@ public class Gameboard {
 					// Copy current board and fill the move in
 					Gameboard next = new Gameboard(TIME_LIMIT);
 					copyBoards(this, next);
-					next.BOARD[i][k] = 1;
+					next.BOARD[i][k] = moveValue;
 					states.add(next);
 				}
 			}
@@ -118,76 +175,6 @@ public class Gameboard {
 		}
 	}
 	
-	public int evaluateBoard(Gameboard gb) {
-		int[][] arr = gb.BOARD;
-		int boardValue;
-		int playerHorizontalCounter = 0;
-		int playerVerticalCounter = 0;
-		int opponentHorizontalCounter = 0;
-		int opponentVerticalCounter = 0;
-
-		for (int i = 0; i < arr.length; i++) {
-			for (int k = 0; k < arr.length; k++) {
-				if (arr[i][k] != 0) {
-					if (arr[i][k] < 0) {
-						playerHorizontalCounter = 0;
-					} else {
-						playerHorizontalCounter++;
-					}
-					
-					// Check for performance
-					if (playerHorizontalCounter == 3) {
-						return 1;
-					} else if (opponentHorizontalCounter == 3) {
-						return -1;
-					}
-				} else {
-					// Reset counters due to break in middle.
-					playerHorizontalCounter = 0;
-					opponentHorizontalCounter = 0;
-				}
-			}
-			playerHorizontalCounter = 0;
-			opponentHorizontalCounter = 0;
-		}
-/*
-			if (arr[x][i] != 0) {
-				if (arr[x][i] < 0) {
-					playerVerticalCounter = 0;
-					opponentVerticalCounter++;
-				} else {
-					playerVerticalCounter++;
-					opponentVerticalCounter = 0;
-				}
-				// Check if done.
-				if (playerVerticalCounter == 4) {
-					return 1;
-				} else if (opponentVerticalCounter == 4) {
-					return -1;
-				}
-			} else {
-				// Reset counters due to break in middle.
-				playerVerticalCounter = 0;
-				opponentVerticalCounter = 0;
-			}
-		}*/
-		return 0; // No one wins.
-	}
-
-
-	/*
-	 * // Evaluate a move on an empty space public int evaluateMove(Piece p) {
-	 * int total = 0; int score = 0; int x = p.getX(); int y = p.getY(); int
-	 * owner = p.getOwner();
-	 * 
-	 * for (int i = 0; i < BOARD.length; i++) { if (BOARD[x][i] == owner) {
-	 * score += 2; } else if (BOARD[x][i] != 0) {
-	 * 
-	 * } }
-	 * 
-	 * }
-	 */
-
 	public String toString() {
 		String str = "  1 2 3 4 5 6 7 8";
 		char c = 'A';

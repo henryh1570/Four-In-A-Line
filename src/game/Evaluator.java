@@ -2,96 +2,331 @@ package game;
 
 public class Evaluator {
 	
-	private final int DEFEAT = -10000;
 	private final int VICTORY = 1000000;
 
-	// Score the Opponent's adjacent pieces.
-	public int getHorizontalEnemyAdjacents(int[] arr) {
+	// Evaluate all rows of the board then the columns.
+	// Score based on consecutive adjacents and preventing loss.
+	public int evaluatePlayerBoard(int[][] board) {
 		int score = 0;
-		int adjacents = 0;
-		for (int i = 0; i < arr.length; i++) {
-			
-			// Enemy has an adjacent
-			if (arr[i] < 0) {
-				adjacents++;
-			} else if (arr[i] > 0) { 
-				// Player cutting off
-				adjacents = 0;
+		for (int i = 0; i < board.length; i++) {
+			int rowValue = getHorizontalPlayerAdjacents(board[i]);
+			if (rowValue == VICTORY) {
+				return VICTORY;
+			} else {
+				score += rowValue;
+			}
+		}
+		
+		for (int k = 0; k < board.length; k++) {
+			int colValue = getVerticalPlayerAdjacents(k, board);
+			if (colValue == VICTORY) {
+				return VICTORY;
+			} else {
+				score += colValue;
+			}
+		}		
+		return score;
+	}
+	
+	// Evaluate all rows of the board then the columns.
+	// Score based on consecutive adjacents and preventing loss.
+	public int evaluateOpponentBoard(int[][] board) {
+		int score = 0;
+		for (int i = 0; i < board.length; i++) {
+			int rowValue = getHorizontalOpponentAdjacents(board[i]);
+			if (rowValue == VICTORY) {
+				return VICTORY;
+			} else {
+				score += rowValue;
+			}
+		}
+		
+		for (int k = 0; k < board.length; k++) {
+			int colValue = getVerticalOpponentAdjacents(k, board);
+			if (colValue == VICTORY) {
+				return VICTORY;
+			} else {
+				score += colValue;
+			}
+		}		
+		return score;		
+	}
+	
+	// Score the Player's adjacent pieces.
+	// Does not account for gaps directly.
+	private int getVerticalOpponentAdjacents(int col, int[][] arr) {
+		int score = 0;
+		int playerAdjacents = 0;
+		int enemyAdjacents = 0;
+		
+		for (int i = 0; i < arr.length; i++) {			
+			// Player has a piece adjacent to previous space
+			if (arr[i][col] < 0) {
+				enemyAdjacents = 0;
+				playerAdjacents++;
+				
+				// Check win condition
+				if (playerAdjacents == 4) {
+					return VICTORY;
+					// Penalty if piece is on border
+				} else if (i == 0 || (i == arr.length - 1)){
+					score -= 20;
+				}
+			} else if (arr[i][col] > 0) {
+				// Enemy cutting off
+				playerAdjacents = 0;
+				enemyAdjacents++;
+				
+				// adjacent == 1 gives no points
+				if (enemyAdjacents == 2) {
+					// Enemy has 2 adjacent on a border and player blocks it
+					if ((i == arr.length && arr[i - 2][col] < 0) || (i == 2 && arr[3][col] < 0)) {
+						score += 125;
+						// Player completely blocked off enemy adjacent 2
+					} else if ((i != 1) && (arr[i - 2][col] < 0) && (arr[i + 1][col] < 0)) {
+						score += 250;
+						// Player is blocking one of the sides of enemy adjacent 3
+					} else if ((i != 1) && (arr[i - 2][col] < 0) || (arr[i + 1][col] < 0)) {
+						score += 250;
+					}					
+				} else if (enemyAdjacents == 3) {
+					// Enemy has 3 adjacent on border and player blocks it
+					if ((i == arr.length && arr[i - 3][col] < 0) || (i == 2 && arr[3][col] < 0)) {
+						score += 1000;
+						// Player completely blocked off enemy adjacent 3
+					} else if ((i != 2) && (arr[i - 3][col] < 0) && (arr[i + 1][col] < 0)) {
+						score += 1000;
+						// Player is blocking one of the sides of enemy adjacent 3
+					} else if ((i != 2) && (arr[i - 3][col] < 0) || (arr[i + 1][col] < 0)) {
+						score += 500;
+					}
+				}
 			} else {
 				// There is an empty cutoff
-				adjacents = 0;
-				if (adjacents == 2) {
-					score -= 15;
-				} else if (adjacents == 3) {
-					score -= 30;
-				} else if (adjacents == 4) {
-					return DEFEAT;
+				
+				// adjacent == 1 gives no points
+				if (playerAdjacents == 2) {
+					score += 2;
+				} else if (playerAdjacents == 3) {
+					// There's a piece on border: Easily blockable
+					if (i == arr.length || i == 2) {
+						score += 2;
+					} else { // Otherwise it could mean a win
+						score += 100;
+					}
 				}
-			}
-			
-			if (adjacents == 4) {
-				return DEFEAT;
+				playerAdjacents = 0;
+				enemyAdjacents = 0;
 			}
 		}
 		return score;
 	}
 	
-	// Scenarios: For next move
-	//
-	// | |X| | | | | 1 Piece no wall = 0
-	// |X| | | | | | 1 Piece on wall = -1
-	// |X|X| | | | | 2 Adjacent on wall = 1
-	// | |X|X| | | | 2 Adjacent no wall = 3
-	// | |X|X|O| | | 2 Adjacent, 1 Free, no wall block = -10
-	// | | |X|X|O| | 2 Adjacent, 2 Free, no wall block = 2
-	// | | |X| |X| | 2 Gap = 2
-	// |X| |X| |X| | 2 Gap Multi = 2
-	// |X| |X| | | | 2 Gap wall = 1
-	// |X|X|X| | | | 3 Adjacent on wall = 4
-	// |X|X|X|O| | | 3 Adjacent on wall block = -1
-	// | |X|X|X| | | 3 Adjacent no wall no block = 100
-	// | |X|X|X|O| | 3 Adjacent no wall block = 4
-	// | |X| |X|X| | 3 Gap = 3
-	// |X| |X|X| | | 3 Gap wall = 2
-	// |X|X|X|X| | | 4 Adjacent = VICTORY
-	//
-	// |X|O|O| | | | Block 2 = 1
-	// |X|O|O|X| | | Block 2 complete = 5
-	// |X|O|O|O| | | Block 3 = -100
-	// |X|O|O|O|X| | Block 3 complete = 1000
-	// |O|X|O|O| | | Block 3 complete2 = 1000
 	// Score the Player's adjacent pieces.
-	public int getHorizontalPlayerAdjacents(int[] arr) {
+	// Does not account for gaps directly.
+	private int getVerticalPlayerAdjacents(int col, int[][] arr) {
 		int score = 0;
-		int adjacents = 0;
+		int playerAdjacents = 0;
+		int enemyAdjacents = 0;
+		
+		for (int i = 0; i < arr.length; i++) {			
+			// Player has a piece adjacent to previous space
+			if (arr[i][col] > 0) {
+				enemyAdjacents = 0;
+				playerAdjacents++;
+				
+				// Check win condition
+				if (playerAdjacents == 4) {
+					return VICTORY;
+					// Penalty if piece is on border
+				} else if (i == 0 || (i == arr.length - 1)){
+					score -= 20;
+				}
+			} else if (arr[i][col] < 0) {
+				// Enemy cutting off
+				playerAdjacents = 0;
+				enemyAdjacents++;
+				
+				// adjacent == 1 gives no points
+				if (enemyAdjacents == 2) {
+					// Enemy has 2 adjacent on a border and player blocks it
+					if ((i == arr.length && arr[i - 2][col] > 0) || (i == 2 && arr[3][col] > 0)) {
+						score += 125;
+						// Player completely blocked off enemy adjacent 2
+					} else if ((i != 1) && (arr[i - 2][col] > 0) && (arr[i + 1][col] > 0)) {
+						score += 250;
+						// Player is blocking one of the sides of enemy adjacent 3
+					} else if ((i != 1) && (arr[i - 2][col] > 0) || (arr[i + 1][col] > 0)) {
+						score += 250;
+					}					
+				} else if (enemyAdjacents == 3) {
+					// Enemy has 3 adjacent on border and player blocks it
+					if ((i == arr.length && arr[i - 3][col] > 0) || (i == 2 && arr[3][col] > 0)) {
+						score += 1000;
+						// Player completely blocked off enemy adjacent 3
+					} else if ((i != 2) && (arr[i - 3][col] > 0) && (arr[i + 1][col] > 0)) {
+						score += 1000;
+						// Player is blocking one of the sides of enemy adjacent 3
+					} else if ((i != 2) && (arr[i - 3][col] > 0) || (arr[i + 1][col] > 0)) {
+						score += 500;
+					}
+				}
+			} else {
+				// There is an empty cutoff
+				
+				// adjacent == 1 gives no points
+				if (playerAdjacents == 2) {
+					score += 2;
+				} else if (playerAdjacents == 3) {
+					// There's a piece on border: Easily blockable
+					if (i == arr.length || i == 2) {
+						score += 2;
+					} else { // Otherwise it could mean a win
+						score += 100;
+					}
+				}
+				playerAdjacents = 0;
+				enemyAdjacents = 0;
+			}
+		}
+		return score;
+	}
+	
+	// Score the Player's adjacent pieces.
+	// Does not account for gaps directly.
+	private int getHorizontalOpponentAdjacents(int[] arr) {
+		int score = 0;
+		int playerAdjacents = 0;
+		int enemyAdjacents = 0;
+		
+		for (int i = 0; i < arr.length; i++) {			
+			// Player has a piece adjacent to previous space
+			if (arr[i] < 0) {
+				enemyAdjacents = 0;
+				playerAdjacents++;
+				
+				// Check win condition
+				if (playerAdjacents == 4) {
+					return VICTORY;
+					// Penalty if piece is on border
+				} else if (i == 0 || (i == arr.length - 1)){
+					score -= 20;
+				}
+			} else if (arr[i] > 0) {
+				// Enemy cutting off
+				playerAdjacents = 0;
+				enemyAdjacents++;
+				
+				// adjacent == 1 gives no points
+				if (enemyAdjacents == 2) {
+					// Enemy has 2 adjacent on a border and player blocks it
+					if ((i == arr.length && arr[i - 2] < 0) || (i == 2 && arr[3]< 0)) {
+						score += 125;
+						// Player completely blocked off enemy adjacent 2
+					} else if ((i != 1) && (arr[i - 2] < 0) && (arr[i + 1] < 0)) {
+						score += 250;
+						// Player is blocking one of the sides of enemy adjacent 3
+					} else if ((i != 1) && (arr[i - 2] < 0) || (arr[i + 1] < 0)) {
+						score += 250;
+					}					
+				} else if (enemyAdjacents == 3) {
+					// Enemy has 3 adjacent on border and player blocks it
+					if ((i == arr.length && arr[i - 3] < 0) || (i == 2 && arr[3] < 0)) {
+						score += 1000;
+						// Player completely blocked off enemy adjacent 3
+					} else if ((i != 2) && (arr[i - 3] < 0) && (arr[i + 1] < 0)) {
+						score += 1000;
+						// Player is blocking one of the sides of enemy adjacent 3
+					} else if ((i != 2) && (arr[i - 3] < 0) || (arr[i + 1] < 0)) {
+						score += 500;
+					}
+				}
+			} else {
+				// There is an empty cutoff
+				
+				// adjacent == 1 gives no points
+				if (playerAdjacents == 2) {
+					score += 2;
+				} else if (playerAdjacents == 3) {
+					// There's a piece on border: Easily blockable
+					if (i == arr.length || i == 2) {
+						score += 2;
+					} else { // Otherwise it could mean a win
+						score += 100;
+					}
+				}
+				playerAdjacents = 0;
+				enemyAdjacents = 0;
+			}
+		}
+		return score;
+	}
+	
+	// Score the Player's adjacent pieces.
+	// Does not account for gaps directly.
+	private int getHorizontalPlayerAdjacents(int[] arr) {
+		int score = 0;
+		int playerAdjacents = 0;
+		int enemyAdjacents = 0;
 		
 		for (int i = 0; i < arr.length; i++) {			
 			// Player has a piece adjacent to previous space
 			if (arr[i] > 0) {
-				adjacents++;
+				enemyAdjacents = 0;
+				playerAdjacents++;
+				
 				// Check win condition
-				if (adjacents == 4) {
+				if (playerAdjacents == 4) {
 					return VICTORY;
 					// Penalty if piece is on border
 				} else if (i == 0 || (i == arr.length - 1)){
-					score -= 1;
+					score -= 20;
 				}
-			} else if (arr[i] > 0) {
+			} else if (arr[i] < 0) {
 				// Enemy cutting off
-				adjacents = 0;
+				playerAdjacents = 0;
+				enemyAdjacents++;
+				
+				// adjacent == 1 gives no points
+				if (enemyAdjacents == 2) {
+					// Enemy has 2 adjacent on a border and player blocks it
+					if ((i == arr.length && arr[i - 2] > 0) || (i == 2 && arr[3] > 0)) {
+						score += 125;
+						// Player completely blocked off enemy adjacent 2
+					} else if ((i != 1) && (arr[i - 2] > 0) && (arr[i + 1] > 0)) {
+						score += 250;
+						// Player is blocking one of the sides of enemy adjacent 3
+					} else if ((i != 1) && (arr[i - 2] > 0) || (arr[i + 1] > 0)) {
+						score += 250;
+					}					
+				} else if (enemyAdjacents == 3) {
+					// Enemy has 3 adjacent on border and player blocks it
+					if ((i == arr.length && arr[i - 3] > 0) || (i == 2 && arr[3] > 0)) {
+						score += 1000;
+						// Player completely blocked off enemy adjacent 3
+					} else if ((i != 2) && (arr[i - 3] > 0) && (arr[i + 1] > 0)) {
+						score += 1000;
+						// Player is blocking one of the sides of enemy adjacent 3
+					} else if ((i != 2) && (arr[i - 3] > 0) || (arr[i + 1] > 0)) {
+						score += 500;
+					}
+				}
 			} else {
 				// There is an empty cutoff
-				if (adjacents == 2) {
+				
+				// adjacent == 1 gives no points
+				if (playerAdjacents == 2) {
 					score += 2;
-				} else if (adjacents == 3) {
-					// There's a piece on border
+				} else if (playerAdjacents == 3) {
+					// There's a piece on border: Easily blockable
 					if (i == arr.length || i == 2) {
 						score += 2;
-					} else {
+					} else { // Otherwise it could mean a win
 						score += 100;
 					}
 				}
-				adjacents = 0;
+				playerAdjacents = 0;
+				enemyAdjacents = 0;
 			}
 		}
 		return score;
