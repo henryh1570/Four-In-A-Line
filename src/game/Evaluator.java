@@ -2,7 +2,7 @@ package game;
 
 public class Evaluator {
 	
-	private final int VICTORY = 1000000;
+	final int VICTORY = 1000000;
 
 	// Evaluate all rows of the board then the columns.
 	// Score based on consecutive adjacents and preventing loss.
@@ -65,7 +65,7 @@ public class Evaluator {
 			if (arr[i][col] < 0) {
 				enemyAdjacents = 0;
 				playerAdjacents++;
-				score += (i % 4); // Prioritize the middle
+				score -= Math.abs((i - 4) + (col - 4)); // Prioritize the middle
 
 				// Check win condition
 				if (playerAdjacents == 4) {
@@ -83,10 +83,10 @@ public class Evaluator {
 					if ((i == arr.length && arr[i - 2][col] < 0) || (i == 2 && arr[3][col] < 0)) {
 						score += 125;
 						// Player completely blocked off enemy adjacent 2
-					} else if ((i != 1) && (arr[i - 2][col] < 0) && (arr[i + 1][col] < 0)) {
+					} else if ((i != 1) && (arr[i - 2][col] < 0) && ((i < 7) && arr[i + 1][col] < 0)) {
 						score += 250;
 						// Player is blocking one of the sides of enemy adjacent 3
-					} else if ((i != 1) && (arr[i - 2][col] < 0) || (arr[i + 1][col] < 0)) {
+					} else if ((i != 1) && (arr[i - 2][col] < 0) || ((i < 7) && arr[i + 1][col] < 0)) {
 						score += 250;
 					}					
 				} else if (enemyAdjacents == 3) {
@@ -94,10 +94,10 @@ public class Evaluator {
 					if ((i == arr.length && arr[i - 3][col] < 0) || (i == 2 && arr[3][col] < 0)) {
 						score += 1000;
 						// Player completely blocked off enemy adjacent 3
-					} else if ((i != 2) && (arr[i - 3][col] < 0) && (arr[i + 1][col] < 0)) {
+					} else if ((i != 2) && (arr[i - 3][col] < 0) && ((i < 7) && arr[i + 1][col] < 0)) {
 						score += 1000;
 						// Player is blocking one of the sides of enemy adjacent 3
-					} else if ((i != 2) && (arr[i - 3][col] < 0) || (arr[i + 1][col] < 0)) {
+					} else if ((i != 2) && (arr[i - 3][col] < 0) || ((i < 7) && arr[i + 1][col] < 0)) {
 						score += 500;
 					}
 				}
@@ -106,17 +106,14 @@ public class Evaluator {
 				
 				// adjacent == 1 gives no points
 				if (playerAdjacents == 2) {
-					score += 2;
+					score += 5;
 				} else if (playerAdjacents == 3) {
 					// There's a piece on border: Easily blockable
 					if (i == arr.length || i == 2) {
-						score += 2;
 					} else { // Otherwise it could mean a win
 						score += 100;
 					}
 				}
-				playerAdjacents = 0;
-				enemyAdjacents = 0;
 			}
 		}
 		return score;
@@ -129,12 +126,12 @@ public class Evaluator {
 		int playerAdjacents = 0;
 		int enemyAdjacents = 0;
 		
-		for (int i = 0; i < arr.length; i++) {			
+		for (int i = 0; i < arr.length; i++) {
 			// Player has a piece adjacent to previous space
 			if (arr[i][col] > 0) {
 				enemyAdjacents = 0;
 				playerAdjacents++;
-				score += (i % 4); // Prioritize the middle
+				score -= Math.abs((i - 4) + (col - 4)); // Prioritize the middle
 				
 				// Check win condition
 				if (playerAdjacents == 4) {
@@ -152,10 +149,10 @@ public class Evaluator {
 					if ((i == arr.length && arr[i - 2][col] > 0) || (i == 2 && arr[3][col] > 0)) {
 						score += 125;
 						// Player completely blocked off enemy adjacent 2
-					} else if ((i != 1) && (i != 7) && (arr[i - 2][col] > 0) && (arr[i + 1][col] > 0)) {
+					} else if ((i != 1) && (arr[i - 2][col] > 0) && ((i < 7) && arr[i + 1][col] > 0)) {
 						score += 250;
 						// Player is blocking one of the sides of enemy adjacent 3
-					} else if ((i != 1) && (i != 7) && (arr[i - 2][col] > 0) || (arr[i + 1][col] > 0)) {
+					} else if ((i != 1) && (arr[i - 2][col] > 0) || ((i < 7) && arr[i + 1][col] > 0)) {
 						score += 250;
 					}					
 				} else if (enemyAdjacents == 3) {
@@ -163,10 +160,10 @@ public class Evaluator {
 					if ((i == arr.length && arr[i - 3][col] > 0) || (i == 2 && arr[3][col] > 0)) {
 						score += 1000;
 						// Player completely blocked off enemy adjacent 3
-					} else if ((i != 2) && (i != 7) && (arr[i - 3][col] > 0) && (arr[i + 1][col] > 0)) {
+					} else if ((i != 2) && (arr[i - 3][col] > 0) && ((i < 7) && arr[i + 1][col] > 0)) {
 						score += 1000;
 						// Player is blocking one of the sides of enemy adjacent 3
-					} else if ((i != 2) && (i != 7) && (arr[i - 3][col] > 0) || (arr[i + 1][col] > 0)) {
+					} else if ((i != 2) && (arr[i - 3][col] > 0) || ((i < 7) && arr[i + 1][col] > 0)) {
 						score += 500;
 					}
 				}
@@ -175,17 +172,14 @@ public class Evaluator {
 				
 				// adjacent == 1 gives no points
 				if (playerAdjacents == 2) {
-					score += 2;
+					score += 5;
 				} else if (playerAdjacents == 3) {
 					// There's a piece on border: Easily blockable
 					if (i == arr.length || i == 2) {
-						score += 2;
 					} else { // Otherwise it could mean a win
 						score += 100;
 					}
 				}
-				playerAdjacents = 0;
-				enemyAdjacents = 0;
 			}
 		}
 		return score;
@@ -203,7 +197,7 @@ public class Evaluator {
 			if (arr[i] < 0) {
 				enemyAdjacents = 0;
 				playerAdjacents++;
-				score += (i % 4); // Prioritize the middle
+				score -= Math.abs((i - 4)); // Prioritize the middle
 				
 				// Check win condition
 				if (playerAdjacents == 4) {
@@ -221,10 +215,10 @@ public class Evaluator {
 					if ((i == arr.length && arr[i - 2] < 0) || (i == 2 && arr[3]< 0)) {
 						score += 125;
 						// Player completely blocked off enemy adjacent 2
-					} else if ((i != 1) && (i != 7) && (i != 7) && (arr[i - 2] < 0) && (arr[i + 1] < 0)) {
+					} else if ((i != 1) && (arr[i - 2] < 0) && ((i < 7) && arr[i + 1] < 0)) {
 						score += 250;
 						// Player is blocking one of the sides of enemy adjacent 3
-					} else if ((i != 1) && (i != 7) && (i != 7) && (arr[i - 2] < 0) || (arr[i + 1] < 0)) {
+					} else if ((i != 1) && (arr[i - 2] < 0) || ((i < 7) && arr[i + 1] < 0)) {
 						score += 250;
 					}					
 				} else if (enemyAdjacents == 3) {
@@ -232,10 +226,10 @@ public class Evaluator {
 					if ((i == arr.length && arr[i - 3] < 0) || (i == 2 && arr[3] < 0)) {
 						score += 1000;
 						// Player completely blocked off enemy adjacent 3
-					} else if ((i != 2) && (i != 7) && (arr[i - 3] < 0) && (arr[i + 1] < 0)) {
+					} else if ((i != 2) && (arr[i - 3] < 0) && ((i < 7) && arr[i + 1] < 0)) {
 						score += 1000;
 						// Player is blocking one of the sides of enemy adjacent 3
-					} else if ((i != 2) && (i != 7) && (arr[i - 3] < 0) || (arr[i + 1] < 0)) {
+					} else if ((i != 2) && (arr[i - 3] < 0) || ((i < 7) && arr[i + 1] < 0)) {
 						score += 500;
 					}
 				}
@@ -244,17 +238,14 @@ public class Evaluator {
 				
 				// adjacent == 1 gives no points
 				if (playerAdjacents == 2) {
-					score += 2;
+					score += 5;
 				} else if (playerAdjacents == 3) {
 					// There's a piece on border: Easily blockable
 					if (i == arr.length || i == 2) {
-						score += 2;
 					} else { // Otherwise it could mean a win
 						score += 100;
 					}
 				}
-				playerAdjacents = 0;
-				enemyAdjacents = 0;
 			}
 		}
 		return score;
@@ -272,7 +263,7 @@ public class Evaluator {
 			if (arr[i] > 0) {
 				enemyAdjacents = 0;
 				playerAdjacents++;
-				score += (i % 4); // Prioritize the middle
+				score -= Math.abs((i - 4)); // Prioritize the middle
 				
 				// Check win condition
 				if (playerAdjacents == 4) {
@@ -290,21 +281,21 @@ public class Evaluator {
 					if ((i == arr.length && arr[i - 2] > 0) || (i == 2 && arr[3] > 0)) {
 						score += 125;
 						// Player completely blocked off enemy adjacent 2
-					} else if ((i != 1) && (i != 7) && (arr[i - 2] > 0) && (arr[i + 1] > 0)) {
+					} else if ((i != 1) && (arr[i - 2] > 0) && ((i < 7) && arr[i + 1] > 0)) {
 						score += 250;
 						// Player is blocking one of the sides of enemy adjacent 3
-					} else if ((i != 1) && (i != 7) && (arr[i - 2] > 0) || (arr[i + 1] > 0)) {
+					} else if ((i != 1) && (arr[i - 2] > 0) || ((i < 7) && arr[i + 1] > 0)) {
 						score += 250;
-					}					
+					}
 				} else if (enemyAdjacents == 3) {
 					// Enemy has 3 adjacent on border and player blocks it
 					if ((i == arr.length && arr[i - 3] > 0) || (i == 2 && arr[3] > 0)) {
 						score += 1000;
 						// Player completely blocked off enemy adjacent 3
-					} else if ((i != 2) && (i != 7) && (arr[i - 3] > 0) && (arr[i + 1] > 0)) {
+					} else if ((i != 2) && (arr[i - 3] > 0) && ((i < 7) && arr[i + 1] > 0)) {
 						score += 1000;
 						// Player is blocking one of the sides of enemy adjacent 3
-					} else if ((i != 2) && (i != 7) && (arr[i - 3] > 0) || (arr[i + 1] > 0)) {
+					} else if ((i != 2) && (arr[i - 3] > 0) || ((i < 7) && arr[i + 1] > 0)) {
 						score += 500;
 					}
 				}
@@ -313,17 +304,14 @@ public class Evaluator {
 				
 				// adjacent == 1 gives no points
 				if (playerAdjacents == 2) {
-					score += 2;
+					score += 5;
 				} else if (playerAdjacents == 3) {
 					// There's a piece on border: Easily blockable
 					if (i == arr.length || i == 2) {
-						score += 2;
 					} else { // Otherwise it could mean a win
 						score += 100;
 					}
 				}
-				playerAdjacents = 0;
-				enemyAdjacents = 0;
 			}
 		}
 		return score;

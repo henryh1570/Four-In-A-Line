@@ -14,19 +14,20 @@ public class App {
 		do {
 			firstTurn = getNumberInput();
 		} while (firstTurn > 2 || firstTurn < 1);
-		// TODO: Who goes First.
 
 		System.out.println("Enter seconds allowed per CPU Move (5 to 30)");
 		int timeLimit = -1;
 		do {
 			timeLimit = getNumberInput();
-		} while (timeLimit > 30 || timeLimit < 5);
+		} while (timeLimit > 30 || timeLimit < 5);		
+		timeLimit *= 1000;
 
 		Gameboard game = new Gameboard(timeLimit);
 		Evaluator evaluator = new Evaluator();
 
+		// AI's first turn?
 		if (firstTurn == 2) {
-			game = computerMove(game, evaluator);
+			game = game.alphaBetaDecision(game, 4);
 			System.out.println(game.toString());
 			System.out.println(evaluator.evaluateOpponentBoard(game.getBoard()));
 		}
@@ -45,7 +46,7 @@ public class App {
 			} else {
 				prev.copyBoards(game, prev);
 				System.out.println("computer moves now");
-				game = computerMove(game, evaluator);
+				game = game.alphaBetaDecision(game, 4);
 				System.out.println(game.toString());
 				lastMove = getLastMove(prev, game, -1);
 				if (lastMove != null && game.isGameOver(lastMove.getX(), lastMove.getY()) < 0) {
