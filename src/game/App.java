@@ -29,7 +29,6 @@ public class App {
 		if (firstTurn == 2) {
 			game = game.alphaBetaDecision(game, 4);
 			System.out.println(game.toString());
-			System.out.println(evaluator.evaluateOpponentBoard(game.getBoard()));
 		}
 
 		boolean isGameOver = false;
