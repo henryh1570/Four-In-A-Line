@@ -21,49 +21,6 @@ public class Gameboard {
 	public int[][] getBoard() {
 		return BOARD;
 	}
-	
-	public int isGameOver() {
-		int playerCounter = 0;
-		int opponentCounter = 0;
-
-		// Consecutive 4 pieces returns true.
-		for (int x = 0; x < BOARD.length; x++) {
-			for (int y = 0; y < BOARD.length; y++) {
-				if (BOARD[x][y] > 0) {
-					playerCounter++;
-					opponentCounter = 0;
-				} else if (BOARD[x][y] < 0) {
-					opponentCounter++;
-					playerCounter = 0;
-				} else {
-					playerCounter = 0;
-					opponentCounter = 0;
-				}
-			}
-			opponentCounter = 0;
-			playerCounter = 0;
-		}
-		
-		// Consecutive 4 pieces returns true.
-		for (int x = 0; x < BOARD.length; x++) {
-			for (int y = 0; y < BOARD.length; y++) {
-				if (BOARD[y][x] > 0) {
-					playerCounter++;
-					opponentCounter = 0;
-				} else if (BOARD[y][x] < 0) {
-					opponentCounter++;
-					playerCounter = 0;
-				} else {
-					playerCounter = 0;
-					opponentCounter = 0;
-				}
-			}
-			opponentCounter = 0;
-			playerCounter = 0;
-		}
-
-		return 0; // No one wins.
-	}
 
 	// Given a point, check the same row and column for a 4 line.
 	// Should be called right after a player makes a move.
@@ -150,7 +107,7 @@ public class Gameboard {
 	}
 	
 	// Return all possible next states of a user's turn.
-	public ArrayList<Gameboard> getNextStates(int moveValue) {
+	public ArrayList<Gameboard> getNextStates(int owner) {
 		ArrayList<Gameboard> states = new ArrayList<Gameboard>();
 		for (int i = 0; i < BOARD.length; i++) {
 			for (int k = 0; k < BOARD.length; k++) {
@@ -159,7 +116,7 @@ public class Gameboard {
 					// Copy current board and fill the move in
 					Gameboard next = new Gameboard(TIME_LIMIT);
 					copyBoards(this, next);
-					next.BOARD[i][k] = moveValue;
+					next.BOARD[i][k] = owner;
 					states.add(next);
 				}
 			}
@@ -173,6 +130,42 @@ public class Gameboard {
 				target.BOARD[i][k] = source.BOARD[i][k];
 			}
 		}
+	}
+	
+	public int min(Gameboard game) {
+		int best = Integer.MAX_VALUE;
+		int index = 0;
+		ArrayList<Gameboard> nextStates = game.getNextStates(1);
+		Evaluator evaluator = new Evaluator();
+		// Look at every next state and choose the lowest.
+		for (int i = 0; i < nextStates.size(); i++) {
+			Gameboard next = nextStates.get(i);
+			int score = evaluator.evaluatePlayerBoard(next.getBoard());
+			if (best < score) {
+				index = i;
+				best = score;
+			}
+		}
+		//TODO : return the index?
+		return best;
+	}
+	
+	public int max(Gameboard game) {
+		int best = Integer.MIN_VALUE;
+		int index = 0;
+		ArrayList<Gameboard> nextStates = game.getNextStates(-1);
+		Evaluator evaluator = new Evaluator();
+		// Look at every next state and choose the highest.
+		for (int i = 0; i < nextStates.size(); i++) {
+			Gameboard next = nextStates.get(i);
+			int score = evaluator.evaluateOpponentBoard(next.getBoard());
+			if (best < score) {
+				index = i;
+				best = score;
+			}
+		}
+		//TODO : return the index?
+		return best;
 	}
 	
 	public String toString() {

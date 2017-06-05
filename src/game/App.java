@@ -32,9 +32,9 @@ public class App {
 		}
 
 		boolean isGameOver = false;
-		//TODO : Fix isGameOver
 		while (!isGameOver) {
-			Gameboard prev = game;
+			Gameboard prev = new Gameboard(timeLimit);
+			prev.copyBoards(game, prev);
 			game = playerMove(game);
 			System.out.println(game.toString());
 			Piece lastMove = getLastMove(prev, game, 1);
@@ -43,7 +43,7 @@ public class App {
 				System.out.println("PLAYER WINS");
 				isGameOver = true;
 			} else {
-				prev = game;
+				prev.copyBoards(game, prev);
 				System.out.println("computer moves now");
 				game = computerMove(game, evaluator);
 				System.out.println(game.toString());

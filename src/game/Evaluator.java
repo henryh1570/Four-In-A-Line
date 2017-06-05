@@ -59,12 +59,14 @@ public class Evaluator {
 		int playerAdjacents = 0;
 		int enemyAdjacents = 0;
 		
-		for (int i = 0; i < arr.length; i++) {			
+		for (int i = 0; i < arr.length; i++) {
+			
 			// Player has a piece adjacent to previous space
 			if (arr[i][col] < 0) {
 				enemyAdjacents = 0;
 				playerAdjacents++;
-				
+				score += (i % 4); // Prioritize the middle
+
 				// Check win condition
 				if (playerAdjacents == 4) {
 					return VICTORY;
@@ -134,6 +136,7 @@ public class Evaluator {
 			if (arr[i][col] > 0) {
 				enemyAdjacents = 0;
 				playerAdjacents++;
+				score += (i % 4); // Prioritize the middle
 				
 				// Check win condition
 				if (playerAdjacents == 4) {
@@ -204,6 +207,7 @@ public class Evaluator {
 			if (arr[i] < 0) {
 				enemyAdjacents = 0;
 				playerAdjacents++;
+				score += (i % 4); // Prioritize the middle
 				
 				// Check win condition
 				if (playerAdjacents == 4) {
@@ -274,6 +278,7 @@ public class Evaluator {
 			if (arr[i] > 0) {
 				enemyAdjacents = 0;
 				playerAdjacents++;
+				score += (i % 4); // Prioritize the middle
 				
 				// Check win condition
 				if (playerAdjacents == 4) {
