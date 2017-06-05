@@ -71,8 +71,6 @@ public class Evaluator {
 				if (playerAdjacents == 4) {
 					return VICTORY;
 					// Penalty if piece is on border
-				} else if (i == 0 || (i == arr.length - 1)){
-					score -= 20;
 				}
 			} else if (arr[i][col] > 0) {
 				// Enemy cutting off
@@ -142,8 +140,6 @@ public class Evaluator {
 				if (playerAdjacents == 4) {
 					return VICTORY;
 					// Penalty if piece is on border
-				} else if (i == 0 || (i == arr.length - 1)){
-					score -= 20;
 				}
 			} else if (arr[i][col] < 0) {
 				// Enemy cutting off
@@ -156,10 +152,10 @@ public class Evaluator {
 					if ((i == arr.length && arr[i - 2][col] > 0) || (i == 2 && arr[3][col] > 0)) {
 						score += 125;
 						// Player completely blocked off enemy adjacent 2
-					} else if ((i != 1) && (arr[i - 2][col] > 0) && (arr[i + 1][col] > 0)) {
+					} else if ((i != 1) && (i != 7) && (arr[i - 2][col] > 0) && (arr[i + 1][col] > 0)) {
 						score += 250;
 						// Player is blocking one of the sides of enemy adjacent 3
-					} else if ((i != 1) && (arr[i - 2][col] > 0) || (arr[i + 1][col] > 0)) {
+					} else if ((i != 1) && (i != 7) && (arr[i - 2][col] > 0) || (arr[i + 1][col] > 0)) {
 						score += 250;
 					}					
 				} else if (enemyAdjacents == 3) {
@@ -167,10 +163,10 @@ public class Evaluator {
 					if ((i == arr.length && arr[i - 3][col] > 0) || (i == 2 && arr[3][col] > 0)) {
 						score += 1000;
 						// Player completely blocked off enemy adjacent 3
-					} else if ((i != 2) && (arr[i - 3][col] > 0) && (arr[i + 1][col] > 0)) {
+					} else if ((i != 2) && (i != 7) && (arr[i - 3][col] > 0) && (arr[i + 1][col] > 0)) {
 						score += 1000;
 						// Player is blocking one of the sides of enemy adjacent 3
-					} else if ((i != 2) && (arr[i - 3][col] > 0) || (arr[i + 1][col] > 0)) {
+					} else if ((i != 2) && (i != 7) && (arr[i - 3][col] > 0) || (arr[i + 1][col] > 0)) {
 						score += 500;
 					}
 				}
@@ -213,8 +209,6 @@ public class Evaluator {
 				if (playerAdjacents == 4) {
 					return VICTORY;
 					// Penalty if piece is on border
-				} else if (i == 0 || (i == arr.length - 1)){
-					score -= 20;
 				}
 			} else if (arr[i] > 0) {
 				// Enemy cutting off
@@ -227,10 +221,10 @@ public class Evaluator {
 					if ((i == arr.length && arr[i - 2] < 0) || (i == 2 && arr[3]< 0)) {
 						score += 125;
 						// Player completely blocked off enemy adjacent 2
-					} else if ((i != 1) && (arr[i - 2] < 0) && (arr[i + 1] < 0)) {
+					} else if ((i != 1) && (i != 7) && (i != 7) && (arr[i - 2] < 0) && (arr[i + 1] < 0)) {
 						score += 250;
 						// Player is blocking one of the sides of enemy adjacent 3
-					} else if ((i != 1) && (arr[i - 2] < 0) || (arr[i + 1] < 0)) {
+					} else if ((i != 1) && (i != 7) && (i != 7) && (arr[i - 2] < 0) || (arr[i + 1] < 0)) {
 						score += 250;
 					}					
 				} else if (enemyAdjacents == 3) {
@@ -238,10 +232,10 @@ public class Evaluator {
 					if ((i == arr.length && arr[i - 3] < 0) || (i == 2 && arr[3] < 0)) {
 						score += 1000;
 						// Player completely blocked off enemy adjacent 3
-					} else if ((i != 2) && (arr[i - 3] < 0) && (arr[i + 1] < 0)) {
+					} else if ((i != 2) && (i != 7) && (arr[i - 3] < 0) && (arr[i + 1] < 0)) {
 						score += 1000;
 						// Player is blocking one of the sides of enemy adjacent 3
-					} else if ((i != 2) && (arr[i - 3] < 0) || (arr[i + 1] < 0)) {
+					} else if ((i != 2) && (i != 7) && (arr[i - 3] < 0) || (arr[i + 1] < 0)) {
 						score += 500;
 					}
 				}
@@ -284,8 +278,6 @@ public class Evaluator {
 				if (playerAdjacents == 4) {
 					return VICTORY;
 					// Penalty if piece is on border
-				} else if (i == 0 || (i == arr.length - 1)){
-					score -= 20;
 				}
 			} else if (arr[i] < 0) {
 				// Enemy cutting off
@@ -298,10 +290,10 @@ public class Evaluator {
 					if ((i == arr.length && arr[i - 2] > 0) || (i == 2 && arr[3] > 0)) {
 						score += 125;
 						// Player completely blocked off enemy adjacent 2
-					} else if ((i != 1) && (arr[i - 2] > 0) && (arr[i + 1] > 0)) {
+					} else if ((i != 1) && (i != 7) && (arr[i - 2] > 0) && (arr[i + 1] > 0)) {
 						score += 250;
 						// Player is blocking one of the sides of enemy adjacent 3
-					} else if ((i != 1) && (arr[i - 2] > 0) || (arr[i + 1] > 0)) {
+					} else if ((i != 1) && (i != 7) && (arr[i - 2] > 0) || (arr[i + 1] > 0)) {
 						score += 250;
 					}					
 				} else if (enemyAdjacents == 3) {
@@ -309,10 +301,10 @@ public class Evaluator {
 					if ((i == arr.length && arr[i - 3] > 0) || (i == 2 && arr[3] > 0)) {
 						score += 1000;
 						// Player completely blocked off enemy adjacent 3
-					} else if ((i != 2) && (arr[i - 3] > 0) && (arr[i + 1] > 0)) {
+					} else if ((i != 2) && (i != 7) && (arr[i - 3] > 0) && (arr[i + 1] > 0)) {
 						score += 1000;
 						// Player is blocking one of the sides of enemy adjacent 3
-					} else if ((i != 2) && (arr[i - 3] > 0) || (arr[i + 1] > 0)) {
+					} else if ((i != 2) && (i != 7) && (arr[i - 3] > 0) || (arr[i + 1] > 0)) {
 						score += 500;
 					}
 				}
